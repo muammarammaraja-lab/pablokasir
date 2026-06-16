@@ -14,6 +14,7 @@
   <nav>
     <a href="index.html">Kasir</a>
     <a href="produksi.html" class="owner-only active">Produksi &amp; Stok</a>
+    <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
     <a href="dashboard.html" class="owner-only">Laporan</a>
     <a href="#" onclick="logout();return false;">Keluar</a>
   </nav>
@@ -112,7 +113,7 @@
       <h3 style="margin-top:24px;">Riwayat Produksi Terbaru</h3>
       <div class="table-wrap" style="margin-top:10px;">
         <table>
-          <thead><tr><th>Tanggal</th><th>Produk</th><th>Hasil</th><th>Total Biaya</th></tr></thead>
+          <thead><tr><th>Tanggal</th><th>No. Batch</th><th>Produk</th><th>Hasil</th><th>Total Biaya</th></tr></thead>
           <tbody id="produksiHistoryBody"></tbody>
         </table>
       </div>
@@ -143,7 +144,7 @@
     <h3 style="margin-top:24px;">Riwayat Pergerakan Stok</h3>
     <div class="table-wrap" style="margin-top:10px;">
       <table>
-        <thead><tr><th>Tanggal</th><th>Produk</th><th>Tipe</th><th>Perubahan</th><th>Saldo Setelah</th><th>Keterangan</th></tr></thead>
+        <thead><tr><th>Tanggal</th><th>Produk</th><th>Tipe</th><th>Perubahan</th><th>Saldo Setelah</th><th>Keterangan</th><th>Oleh</th></tr></thead>
         <tbody id="stokLogBody"></tbody>
       </table>
     </div>

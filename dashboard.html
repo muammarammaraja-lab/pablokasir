@@ -14,6 +14,7 @@
   <nav>
     <a href="index.html">Kasir</a>
     <a href="produksi.html" class="owner-only">Produksi &amp; Stok</a>
+    <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
     <a href="dashboard.html" class="owner-only active">Laporan</a>
     <a href="#" onclick="logout();return false;">Keluar</a>
   </nav>
@@ -34,6 +35,10 @@
     <div class="field">
       <label style="visibility:hidden;">Export</label>
       <button class="btn btn-secondary" type="button" onclick="exportCSV()">Export CSV</button>
+    </div>
+    <div class="field">
+      <label style="visibility:hidden;">Backup</label>
+      <button class="btn btn-secondary" type="button" onclick="backupAllData()">Backup Semua Data</button>
     </div>
   </div>
 
@@ -99,6 +104,30 @@
         <table>
           <thead><tr><th>Produk</th><th>Terjual</th><th>Omzet</th><th>Laba Kotor</th></tr></thead>
           <tbody id="marginBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:20px;">
+    <div class="card">
+      <h3>Stok Kritis</h3>
+      <p class="subtitle" style="margin-bottom:10px;">Produk yang stoknya di bawah atau sama dengan batas minimum</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Produk</th><th>Stok Saat Ini</th><th>Batas Minimum</th></tr></thead>
+          <tbody id="stokKritisBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Produk Terlaris</h3>
+      <p class="subtitle" style="margin-bottom:10px;">Berdasarkan jumlah terjual di periode terpilih di atas</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Peringkat</th><th>Produk</th><th>Jumlah Terjual</th></tr></thead>
+          <tbody id="terlarisBody"></tbody>
         </table>
       </div>
     </div>

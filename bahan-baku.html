@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bahan Baku — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <svg class="logo-mark" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>ARENSI <span>POS</span>
+  </div>
+  <nav>
+    <a href="index.html">Kasir</a>
+    <a href="produksi.html" class="owner-only">Produksi &amp; Stok</a>
+    <a href="bahan-baku.html" class="owner-only active">Bahan Baku</a>
+    <a href="dashboard.html" class="owner-only">Laporan</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Bahan Baku &amp; Resep</h1>
+  <p class="subtitle">Kelola bahan mentah, catat pembelian, dan atur resep tiap produk</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 id="bahanFormTitle">Tambah Bahan Baku</h3>
+      <form id="bahanForm" style="margin-top:14px;">
+        <input type="hidden" id="bahanId">
+        <div class="field">
+          <label>Nama Bahan</label>
+          <input type="text" id="namaBahan" required placeholder="Nira">
+        </div>
+        <div class="field">
+          <label>Satuan</label>
+          <select id="satuanBahan">
+            <option value="liter">liter</option>
+            <option value="kg">kg</option>
+            <option value="pcs">pcs</option>
+            <option value="pack">pack</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Stok Minimum (alert menipis)</label>
+          <input type="number" id="stokMinimumBahan" placeholder="5">
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan Bahan</button>
+        <button type="button" class="btn btn-secondary" onclick="resetBahanForm()">Batal</button>
+      </form>
+
+      <h3 style="margin-top:24px;">Daftar Bahan Baku</h3>
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead><tr><th>Nama</th><th>Satuan</th><th>Harga/Satuan</th><th>Stok</th><th></th><th></th></tr></thead>
+          <tbody id="bahanTableBody"></tbody>
+        </table>
+      </div>
+
+      <button type="button" class="btn-icon-only" style="color:var(--brown-500);margin-top:10px;" id="toggleArchivedBahanBtn" onclick="toggleArchivedBahan()">Lihat bahan diarsipkan</button>
+      <div id="archivedBahanSection" style="display:none;margin-top:14px;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nama</th><th>Satuan</th><th>Diarsipkan</th><th></th></tr></thead>
+            <tbody id="archivedBahanTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Beli Bahan Baku</h3>
+      <p class="subtitle" style="margin-bottom:14px;">Mencatat pembelian otomatis menambah stok, memperbarui harga per satuan, dan mencatat pengeluaran</p>
+      <form id="beliBahanForm">
+        <div class="field">
+          <label>Bahan Baku</label>
+          <select id="beliBahanId"></select>
+        </div>
+        <div class="field">
+          <label>Qty Dibeli</label>
+          <input type="number" step="0.01" id="beliQty" required placeholder="0">
+        </div>
+        <div class="field">
+          <label>Total Harga Pembelian</label>
+          <input type="number" id="beliTotalHarga" required placeholder="0">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Catat Pembelian</button>
+      </form>
+
+      <h3 style="margin-top:24px;">Resep Produk</h3>
+      <p class="subtitle" style="margin-bottom:14px;">Tentukan bahan baku apa & berapa banyak dibutuhkan untuk menghasilkan 1 satuan produk jadi</p>
+      <div class="field">
+        <label>Pilih Produk</label>
+        <select id="resepProductSelect" onchange="loadResep(this.value)"></select>
+      </div>
+
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead><tr><th>Bahan Baku</th><th>Qty per Satuan Produk</th><th></th></tr></thead>
+          <tbody id="resepTableBody"></tbody>
+        </table>
+      </div>
+
+      <form id="resepForm" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:end;">
+        <div class="field" style="flex:1;min-width:140px;margin-bottom:0;">
+          <label>Tambah Bahan</label>
+          <select id="resepBahanSelect"></select>
+        </div>
+        <div class="field" style="width:120px;margin-bottom:0;">
+          <label>Qty/Satuan</label>
+          <input type="number" step="0.0001" id="resepQty" required placeholder="0">
+        </div>
+        <button type="submit" class="btn btn-primary">Tambah</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/bahan-baku.js"></script>
+</body>
+</html>
