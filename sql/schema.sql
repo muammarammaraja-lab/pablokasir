@@ -21,12 +21,16 @@ create table products (
 
 create table sales (
   id uuid primary key default gen_random_uuid(),
+  nomor_transaksi text,
   tanggal timestamptz default now(),
   total_belanja numeric(12,2) not null,
   uang_bayar numeric(12,2) not null,
   uang_kembalian numeric(12,2) not null,
-  metode_pembayaran text default 'Cash'
+  metode_pembayaran text default 'Cash',
+  dibuat_oleh text
 );
+
+create sequence if not exists transaksi_seq start 1;
 
 create table sale_items (
   id uuid primary key default gen_random_uuid(),
@@ -112,7 +116,7 @@ create or replace function process_sale(
   p_items jsonb,           -- [{"product_id":"...","qty":2,"harga_satuan":35000}, ...]
   p_uang_bayar numeric,
   p_metode text default 'Cash'
-) returns uuid as $$
+) returns table(sale_id uuid, nomor_transaksi text) as $$
 declare
   v_sale_id uuid;
   v_total numeric := 0;
@@ -120,8 +124,10 @@ declare
   v_stok numeric;
   v_saldo_baru numeric;
   v_email text;
+  v_nomor_transaksi text;
 begin
   select email into v_email from auth.users where id = auth.uid();
+  v_nomor_transaksi := 'INV-' || to_char(now(), 'YYYYMMDD') || '-' || lpad(nextval('transaksi_seq')::text, 4, '0');
 
   -- Validasi stok dulu untuk SEMUA item, sebelum nulis apapun.
   -- FOR UPDATE mengunci baris produk ini sampai transaksi selesai, supaya kalau ada
@@ -139,8 +145,8 @@ begin
     raise exception 'Uang bayar kurang dari total belanja';
   end if;
 
-  insert into sales (total_belanja, uang_bayar, uang_kembalian, metode_pembayaran)
-  values (v_total, p_uang_bayar, p_uang_bayar - v_total, p_metode)
+  insert into sales (nomor_transaksi, total_belanja, uang_bayar, uang_kembalian, metode_pembayaran, dibuat_oleh)
+  values (v_nomor_transaksi, v_total, p_uang_bayar, p_uang_bayar - v_total, p_metode, v_email)
   returning id into v_sale_id;
 
   for v_item in select * from jsonb_array_elements(p_items) loop
@@ -155,7 +161,7 @@ begin
     values ((v_item->>'product_id')::uuid, 'Penjualan', -((v_item->>'qty')::numeric), v_saldo_baru, v_sale_id, v_email);
   end loop;
 
-  return v_sale_id;
+  return query select v_sale_id, v_nomor_transaksi;
 end;
 $$ language plpgsql security definer set search_path = public;
 
