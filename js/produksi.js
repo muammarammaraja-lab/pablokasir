@@ -180,7 +180,7 @@ async function submitProduksi(e) {
 async function loadRecentProduksi() {
   const { data, error } = await sb
     .from('produksi')
-    .select('tanggal, qty_hasil, biaya_bahan_mentah, biaya_produksi, products(nama_produk, satuan)')
+    .select('tanggal, qty_hasil, biaya_bahan_mentah, biaya_produksi, nomor_batch, products(nama_produk, satuan)')
     .order('tanggal', { ascending: false })
     .limit(10);
   if (error) { console.error(error); return; }
@@ -188,11 +188,12 @@ async function loadRecentProduksi() {
   tbody.innerHTML = data.length ? data.map(r => `
     <tr>
       <td>${formatTanggal(r.tanggal)}</td>
+      <td>${r.nomor_batch || '-'}</td>
       <td>${r.products?.nama_produk || '-'}</td>
       <td>${r.qty_hasil} ${r.products?.satuan || ''}</td>
       <td>${formatRupiah(Number(r.biaya_bahan_mentah) + Number(r.biaya_produksi))}</td>
     </tr>
-  `).join('') : '<tr><td colspan="4" style="color:var(--brown-500);">Belum ada riwayat produksi</td></tr>';
+  `).join('') : '<tr class="muted-row"><td colspan="5">Belum ada riwayat produksi</td></tr>';
 }
 
 document.getElementById('produkForm').addEventListener('submit', submitProduk);
@@ -226,20 +227,24 @@ async function submitKoreksi(e) {
 async function loadStokLog() {
   const { data, error } = await sb
     .from('stok_log')
-    .select('tanggal, tipe, qty, saldo_setelah, keterangan, products(nama_produk, satuan)')
+    .select('tanggal, tipe, qty, saldo_setelah, keterangan, dibuat_oleh, products(nama_produk, satuan), bahan_baku(nama_bahan, satuan)')
     .order('tanggal', { ascending: false })
     .limit(20);
   if (error) { console.error(error); return; }
-  document.getElementById('stokLogBody').innerHTML = data.length ? data.map(r => `
+  document.getElementById('stokLogBody').innerHTML = data.length ? data.map(r => {
+    const nama = r.products?.nama_produk || r.bahan_baku?.nama_bahan || '-';
+    const satuan = r.products?.satuan || r.bahan_baku?.satuan || '';
+    return `
     <tr>
       <td>${formatTanggal(r.tanggal)}</td>
-      <td>${r.products?.nama_produk || '-'}</td>
+      <td>${nama}</td>
       <td><span class="badge ${Number(r.qty) >= 0 ? 'badge-ok' : 'badge-low'}">${r.tipe}</span></td>
-      <td style="color:${Number(r.qty) >= 0 ? 'var(--green-600)' : 'var(--red-600)'};font-weight:600;">${Number(r.qty) >= 0 ? '+' : ''}${r.qty} ${r.products?.satuan || ''}</td>
-      <td>${r.saldo_setelah} ${r.products?.satuan || ''}</td>
+      <td style="color:${Number(r.qty) >= 0 ? 'var(--green-600)' : 'var(--red-600)'};font-weight:600;">${Number(r.qty) >= 0 ? '+' : ''}${r.qty} ${satuan}</td>
+      <td>${r.saldo_setelah} ${satuan}</td>
       <td>${r.keterangan || '-'}</td>
-    </tr>
-  `).join('') : '<tr class="muted-row"><td colspan="6">Belum ada pergerakan stok</td></tr>';
+      <td style="font-size:11px;color:var(--brown-500);">${r.dibuat_oleh || '-'}</td>
+    </tr>`;
+  }).join('') : '<tr class="muted-row"><td colspan="7">Belum ada pergerakan stok</td></tr>';
 }
 
 (async () => {

@@ -38,6 +38,41 @@ async function loadDashboard(periode = currentPeriode) {
   document.getElementById('breakdownBody').innerHTML = kategoriList.length
     ? kategoriList.map(k => `<tr><td>${k}</td><td style="text-align:right;">${formatRupiah(breakdown[k])}</td></tr>`).join('')
     : '<tr class="muted-row"><td colspan="2">Belum ada pengeluaran periode ini</td></tr>';
+
+  await loadProdukTerlaris(startIso);
+  await loadStokKritis();
+}
+
+async function loadStokKritis() {
+  const { data, error } = await sb.from('products').select('nama_produk, satuan, stok, stok_minimum').is('deleted_at', null);
+  if (error) { console.error(error); return; }
+  const kritis = data.filter(p => Number(p.stok) <= Number(p.stok_minimum));
+  document.getElementById('stokKritisBody').innerHTML = kritis.length ? kritis.map(p => `
+    <tr>
+      <td>${p.nama_produk}</td>
+      <td style="color:var(--red-600);font-weight:600;">${p.stok} ${p.satuan}</td>
+      <td>${p.stok_minimum} ${p.satuan}</td>
+    </tr>
+  `).join('') : '<tr class="muted-row"><td colspan="3">Semua stok aman, tidak ada yang menipis</td></tr>';
+}
+
+async function loadProdukTerlaris(startIso) {
+  const { data, error } = await sb.from('v_penjualan_detail').select('*').gte('tanggal', startIso);
+  if (error) { console.error(error); return; }
+  const byProduct = {};
+  (data || []).forEach(row => {
+    const nama = row.nama_produk || 'Tidak diketahui';
+    if (!byProduct[nama]) byProduct[nama] = { qty: 0, satuan: row.satuan || '' };
+    byProduct[nama].qty += Number(row.qty);
+  });
+  const rows = Object.entries(byProduct).sort((a, b) => b[1].qty - a[1].qty).slice(0, 5);
+  document.getElementById('terlarisBody').innerHTML = rows.length ? rows.map(([nama, r], i) => `
+    <tr>
+      <td>#${i + 1}</td>
+      <td>${nama}</td>
+      <td>${r.qty} ${r.satuan}</td>
+    </tr>
+  `).join('') : '<tr class="muted-row"><td colspan="3">Belum ada penjualan periode ini</td></tr>';
 }
 
 async function loadMarginReport(startIso) {
@@ -127,6 +162,32 @@ function exportCSV() {
   a.remove();
   URL.revokeObjectURL(url);
   showToast('Laporan berhasil diunduh', 'success');
+}
+
+async function backupAllData() {
+  showToast('Menyiapkan backup, mohon tunggu...', 'success');
+  try {
+    const tables = ['products', 'bahan_baku', 'resep', 'sales', 'sale_items', 'produksi', 'expenses', 'stok_log'];
+    const result = {};
+    for (const t of tables) {
+      const { data, error } = await sb.from(t).select('*');
+      if (error) throw error;
+      result[t] = data;
+    }
+    const json = JSON.stringify(result, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup_arensi_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Backup berhasil diunduh', 'success');
+  } catch (err) {
+    showToast('Gagal membuat backup: ' + err.message, 'danger');
+  }
 }
 
 (async () => {
