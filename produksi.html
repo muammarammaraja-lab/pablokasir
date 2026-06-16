@@ -59,10 +59,17 @@
           <input type="number" id="minQtyGrosir" placeholder="10">
         </div>
         <div class="field">
-          <label>Stok Minimum (alert menipis)</label>
-          <input type="number" id="stokMinimum" placeholder="5">
-        </div>
-        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+  <label>Stok Minimum (alert menipis)</label>
+  <input type="number" id="stokMinimum" placeholder="5">
+</div>
+<div class="field">
+  <label>Barcode/QR (opsional)</label>
+  <div style="display:flex;gap:8px;">
+    <input type="text" id="barcodeProduk" placeholder="Scan atau ketik manual" style="flex:1;">
+    <button type="button" class="btn btn-secondary" onclick="scanForProductForm()" style="white-space:nowrap;">Scan</button>
+  </div>
+</div>
+<button type="submit" class="btn btn-primary">Simpan Produk</button>
         <button type="button" class="btn btn-secondary" onclick="resetProdukForm()">Batal</button>
       </form>
 
