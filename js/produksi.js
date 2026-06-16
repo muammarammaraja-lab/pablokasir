@@ -99,8 +99,9 @@ async function restoreProduct(id) {
 }
 
 function renderProduksiSelect() {
-  const sel = document.getElementById('produksiProduct');
-  sel.innerHTML = productsList.map(p => `<option value="${p.id}">${p.nama_produk}</option>`).join('');
+  const options = productsList.map(p => `<option value="${p.id}">${p.nama_produk}</option>`).join('');
+  document.getElementById('produksiProduct').innerHTML = options;
+  document.getElementById('koreksiProduct').innerHTML = options;
 }
 
 async function submitProduk(e) {
@@ -196,6 +197,51 @@ async function loadRecentProduksi() {
 
 document.getElementById('produkForm').addEventListener('submit', submitProduk);
 document.getElementById('produksiForm').addEventListener('submit', submitProduksi);
+document.getElementById('koreksiForm').addEventListener('submit', submitKoreksi);
+
+async function submitKoreksi(e) {
+  e.preventDefault();
+  const product_id = document.getElementById('koreksiProduct').value;
+  const qty_aktual = parseFloat(document.getElementById('koreksiQty').value);
+  const alasan = document.getElementById('koreksiAlasan').value.trim();
+
+  if (!product_id) { showToast('Pilih produk dulu', 'danger'); return; }
+  if (isNaN(qty_aktual) || qty_aktual < 0) { showToast('Stok aktual tidak valid', 'danger'); return; }
+  if (!alasan) { showToast('Alasan koreksi wajib diisi', 'danger'); return; }
+
+  const { error } = await sb.rpc('process_koreksi_stok', {
+    p_product_id: product_id,
+    p_qty_aktual: qty_aktual,
+    p_alasan: alasan
+  });
+
+  if (error) { showToast('Gagal menyimpan koreksi: ' + error.message, 'danger'); return; }
+
+  document.getElementById('koreksiForm').reset();
+  await loadProductsList();
+  await loadStokLog();
+  showToast('Koreksi stok berhasil disimpan', 'success');
+}
+
+async function loadStokLog() {
+  const { data, error } = await sb
+    .from('stok_log')
+    .select('tanggal, tipe, qty, saldo_setelah, keterangan, products(nama_produk, satuan)')
+    .order('tanggal', { ascending: false })
+    .limit(20);
+  if (error) { console.error(error); return; }
+  document.getElementById('stokLogBody').innerHTML = data.length ? data.map(r => `
+    <tr>
+      <td>${formatTanggal(r.tanggal)}</td>
+      <td>${r.products?.nama_produk || '-'}</td>
+      <td><span class="badge ${Number(r.qty) >= 0 ? 'badge-ok' : 'badge-low'}">${r.tipe}</span></td>
+      <td style="color:${Number(r.qty) >= 0 ? 'var(--green-600)' : 'var(--red-600)'};font-weight:600;">${Number(r.qty) >= 0 ? '+' : ''}${r.qty} ${r.products?.satuan || ''}</td>
+      <td>${r.saldo_setelah} ${r.products?.satuan || ''}</td>
+      <td>${r.keterangan || '-'}</td>
+    </tr>
+  `).join('') : '<tr class="muted-row"><td colspan="6">Belum ada pergerakan stok</td></tr>';
+}
 
 loadProductsList();
 loadRecentProduksi();
+loadStokLog();
