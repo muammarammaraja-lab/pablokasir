@@ -78,6 +78,37 @@ create table resep (
   unique (product_id, bahan_baku_id)
 );
 
+-- 1c. SUPPLIER & PURCHASE ORDER -------------------------------
+-- Lightweight: cuma 2 status (Dipesan -> Diterima), bukan workflow approval berjenjang.
+-- Kalau barang langsung diterima saat itu juga, "Terima" tinggal diklik langsung setelah buat PO.
+
+create table suppliers (
+  id uuid primary key default gen_random_uuid(),
+  nama_supplier text not null,
+  kontak text,
+  alamat text,
+  deleted_at timestamptz,
+  created_at timestamptz default now()
+);
+
+create table purchase_orders (
+  id uuid primary key default gen_random_uuid(),
+  nomor_po text,
+  supplier_id uuid references suppliers(id),
+  bahan_baku_id uuid references bahan_baku(id),
+  qty_pesan numeric(12,2) not null,
+  harga_estimasi numeric(12,2),
+  status text check (status in ('Dipesan','Diterima','Dibatalkan')) default 'Dipesan',
+  tanggal_pesan timestamptz default now(),
+  tanggal_terima timestamptz,
+  qty_terima numeric(12,2),
+  harga_aktual numeric(12,2),
+  catatan text,
+  dibuat_oleh text
+);
+
+create sequence if not exists po_seq start 1;
+
 create table stok_log (
   id uuid primary key default gen_random_uuid(),
   product_id uuid references products(id),
@@ -364,10 +395,129 @@ create policy "resep_delete_owner" on resep for delete to authenticated using (
   exists (select 1 from profiles where id = auth.uid() and role = 'owner')
 );
 
+-- suppliers & purchase_orders: murni urusan pembelian, cuma owner
+alter table suppliers enable row level security;
+alter table purchase_orders enable row level security;
+
+create policy "suppliers_select_owner" on suppliers for select to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+create policy "suppliers_insert_owner" on suppliers for insert to authenticated with check (
+  exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+create policy "suppliers_update_owner" on suppliers for update to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+
+create policy "po_select_owner" on purchase_orders for select to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+
 grant execute on function process_sale(jsonb, numeric, text) to authenticated;
 grant execute on function process_produksi(uuid, numeric, numeric, numeric, text) to authenticated;
 grant execute on function process_koreksi_stok(uuid, numeric, text) to authenticated;
 grant execute on function process_beli_bahan(uuid, numeric, numeric) to authenticated;
+grant execute on function process_buat_po(uuid, uuid, numeric, numeric, text) to authenticated;
+grant execute on function process_terima_po(uuid, numeric, numeric) to authenticated;
+grant execute on function process_batalkan_po(uuid) to authenticated;
+
+-- 4d. FUNGSI: Purchase Order (buat, terima, batalkan) ----------
+
+create or replace function process_buat_po(
+  p_supplier_id uuid,
+  p_bahan_baku_id uuid,
+  p_qty_pesan numeric,
+  p_harga_estimasi numeric,
+  p_catatan text default null
+) returns uuid as $$
+declare
+  v_role text;
+  v_email text;
+  v_po_id uuid;
+  v_nomor_po text;
+begin
+  select role into v_role from profiles where id = auth.uid();
+  if v_role is distinct from 'owner' then
+    raise exception 'Hanya Owner yang bisa membuat PO';
+  end if;
+  if p_qty_pesan <= 0 then
+    raise exception 'Qty pesan harus lebih dari 0';
+  end if;
+
+  select email into v_email from auth.users where id = auth.uid();
+  v_nomor_po := 'PO-' || to_char(now(), 'YYYYMMDD') || '-' || lpad(nextval('po_seq')::text, 4, '0');
+
+  insert into purchase_orders (nomor_po, supplier_id, bahan_baku_id, qty_pesan, harga_estimasi, catatan, dibuat_oleh)
+  values (v_nomor_po, p_supplier_id, p_bahan_baku_id, p_qty_pesan, p_harga_estimasi, p_catatan, v_email)
+  returning id into v_po_id;
+
+  return v_po_id;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+create or replace function process_terima_po(
+  p_po_id uuid,
+  p_qty_terima numeric,
+  p_harga_aktual numeric
+) returns void as $$
+declare
+  v_role text;
+  v_email text;
+  v_bahan_baku_id uuid;
+  v_status text;
+  v_saldo_baru numeric;
+begin
+  select role into v_role from profiles where id = auth.uid();
+  if v_role is distinct from 'owner' then
+    raise exception 'Hanya Owner yang bisa menerima PO';
+  end if;
+  if p_qty_terima <= 0 then
+    raise exception 'Qty terima harus lebih dari 0';
+  end if;
+
+  select bahan_baku_id, status into v_bahan_baku_id, v_status from purchase_orders where id = p_po_id for update;
+  if v_bahan_baku_id is null then
+    raise exception 'PO tidak ditemukan';
+  end if;
+  if v_status <> 'Dipesan' then
+    raise exception 'PO ini sudah diterima atau dibatalkan';
+  end if;
+
+  select email into v_email from auth.users where id = auth.uid();
+
+  update purchase_orders set status = 'Diterima', qty_terima = p_qty_terima, harga_aktual = p_harga_aktual, tanggal_terima = now()
+  where id = p_po_id;
+
+  update bahan_baku set stok = stok + p_qty_terima, harga_per_satuan = p_harga_aktual / p_qty_terima
+  where id = v_bahan_baku_id
+  returning stok into v_saldo_baru;
+
+  insert into stok_log (bahan_baku_id, tipe, qty, saldo_setelah, keterangan, dibuat_oleh)
+  values (v_bahan_baku_id, 'Pembelian Bahan', p_qty_terima, v_saldo_baru, 'Terima PO', v_email);
+
+  insert into expenses (kategori, nominal, deskripsi)
+  values ('Modal Bahan Mentah', p_harga_aktual, 'Terima PO dari supplier');
+end;
+$$ language plpgsql security definer set search_path = public;
+
+create or replace function process_batalkan_po(p_po_id uuid) returns void as $$
+declare
+  v_role text;
+  v_status text;
+begin
+  select role into v_role from profiles where id = auth.uid();
+  if v_role is distinct from 'owner' then
+    raise exception 'Hanya Owner yang bisa membatalkan PO';
+  end if;
+
+  select status into v_status from purchase_orders where id = p_po_id;
+  if v_status <> 'Dipesan' then
+    raise exception 'PO ini sudah diterima atau dibatalkan, tidak bisa dibatalkan lagi';
+  end if;
+
+  update purchase_orders set status = 'Dibatalkan' where id = p_po_id;
+end;
+$$ language plpgsql security definer set search_path = public;
 
 -- 6. ROLE MANAGEMENT: profil & peran pengguna -----------------
 -- Owner = akses penuh (kasir, produksi, laporan). Kasir = cuma halaman Kasir.

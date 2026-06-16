@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supplier & PO — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <svg class="logo-mark" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>ARENSI <span>POS</span>
+  </div>
+  <nav>
+    <a href="index.html">Kasir</a>
+    <a href="produksi.html" class="owner-only">Produksi &amp; Stok</a>
+    <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
+    <a href="supplier.html" class="owner-only active">Supplier &amp; PO</a>
+    <a href="riwayat.html" class="owner-only">Riwayat</a>
+    <a href="dashboard.html" class="owner-only">Laporan</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Supplier &amp; Purchase Order</h1>
+  <p class="subtitle">Kelola pemasok bahan baku dan pesanan pembelian</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 id="supplierFormTitle">Tambah Supplier</h3>
+      <form id="supplierForm" style="margin-top:14px;">
+        <input type="hidden" id="supplierId">
+        <div class="field">
+          <label>Nama Supplier</label>
+          <input type="text" id="namaSupplier" required placeholder="Pak Udin (Nira)">
+        </div>
+        <div class="field">
+          <label>Kontak (HP/WA)</label>
+          <input type="text" id="kontakSupplier" placeholder="0812xxxxxxx">
+        </div>
+        <div class="field">
+          <label>Alamat</label>
+          <input type="text" id="alamatSupplier" placeholder="Desa ..., Sinjai">
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan Supplier</button>
+        <button type="button" class="btn btn-secondary" onclick="resetSupplierForm()">Batal</button>
+      </form>
+
+      <h3 style="margin-top:24px;">Daftar Supplier</h3>
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th></th><th></th></tr></thead>
+          <tbody id="supplierTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Buat PO Baru</h3>
+      <p class="subtitle" style="margin-bottom:14px;">Order belum mengubah stok — stok bertambah otomatis saat PO ditandai "Terima"</p>
+      <form id="poForm">
+        <div class="field">
+          <label>Supplier</label>
+          <select id="poSupplier"></select>
+        </div>
+        <div class="field">
+          <label>Bahan Baku</label>
+          <select id="poBahan"></select>
+        </div>
+        <div class="field">
+          <label>Qty Dipesan</label>
+          <input type="number" step="0.01" id="poQty" required placeholder="0">
+        </div>
+        <div class="field">
+          <label>Estimasi Harga Total (opsional)</label>
+          <input type="number" id="poHargaEstimasi" placeholder="0">
+        </div>
+        <div class="field">
+          <label>Catatan</label>
+          <input type="text" id="poCatatan" placeholder="Kirim hari Jumat">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Buat PO</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Daftar Purchase Order</h3>
+    <div class="table-wrap" style="margin-top:10px;">
+      <table>
+        <thead><tr><th>No. PO</th><th>Supplier</th><th>Bahan</th><th>Qty Pesan</th><th>Status</th><th>Tanggal</th><th></th></tr></thead>
+        <tbody id="poTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="terimaModal" style="display:none;position:fixed;inset:0;background:rgba(61,40,23,0.55);align-items:center;justify-content:center;z-index:50;">
+  <div class="card" style="width:300px;">
+    <h3 style="margin-bottom:10px;">Konfirmasi Terima PO</h3>
+    <form id="terimaForm">
+      <input type="hidden" id="terimaPoId">
+      <div class="field">
+        <label>Qty Diterima (aktual)</label>
+        <input type="number" step="0.01" id="terimaQty" required placeholder="0">
+      </div>
+      <div class="field">
+        <label>Harga Aktual Total</label>
+        <input type="number" id="terimaHarga" required placeholder="0">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Konfirmasi Terima</button>
+      <button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="closeTerima()">Batal</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/supplier.js"></script>
+</body>
+</html>
