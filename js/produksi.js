@@ -242,6 +242,10 @@ async function loadStokLog() {
   `).join('') : '<tr class="muted-row"><td colspan="6">Belum ada pergerakan stok</td></tr>';
 }
 
-loadProductsList();
-loadRecentProduksi();
-loadStokLog();
+(async () => {
+  const ok = await requireAuth(['owner']);
+  if (!ok) return;
+  loadProductsList();
+  loadRecentProduksi();
+  loadStokLog();
+})();

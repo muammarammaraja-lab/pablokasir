@@ -182,5 +182,9 @@ function closeReceipt() {
 document.getElementById('uangBayar').addEventListener('input', renderSummary);
 document.getElementById('searchProduct').addEventListener('input', (e) => renderProducts(e.target.value));
 
-renderCart();
-loadProducts();
+(async () => {
+  const ok = await requireAuth(['owner', 'kasir']);
+  if (!ok) return;
+  renderCart();
+  loadProducts();
+})();

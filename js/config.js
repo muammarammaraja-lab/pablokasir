@@ -1,4 +1,6 @@
-const SUPABASE_URL = "https://kyfeyucsspfgyajsqhtp.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5ZmV5dWNzc3BmZ3lhanNxaHRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1OTc4MjQsImV4cCI6MjA5NzE3MzgyNH0.XlV8_qQq54hrQ7ssodQAIfTdg9onvYsbv7BgPOU7Czc";
+// Ganti dua nilai di bawah dengan punya project Supabase kamu sendiri
+// (Project Settings > API di dashboard Supabase)
+const SUPABASE_URL = "https://xxxxxxxxxxxx.supabase.co";
+const SUPABASE_ANON_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

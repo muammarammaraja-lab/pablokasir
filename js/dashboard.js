@@ -129,4 +129,8 @@ function exportCSV() {
   showToast('Laporan berhasil diunduh', 'success');
 }
 
-loadDashboard(currentPeriode);
+(async () => {
+  const ok = await requireAuth(['owner']);
+  if (!ok) return;
+  loadDashboard(currentPeriode);
+})();
