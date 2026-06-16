@@ -71,9 +71,13 @@
 
 <div id="receiptModal" style="display:none;position:fixed;inset:0;background:rgba(61,40,23,0.55);align-items:center;justify-content:center;z-index:50;">
   <div class="card" style="width:320px;max-height:80vh;overflow:auto;">
-    <h3 style="margin-bottom:6px;">Struk Transaksi</h3>
-    <div id="receiptBody"></div>
-    <button class="btn btn-secondary btn-block" style="margin-top:14px;" onclick="closeReceipt()">Tutup</button>
+    <div id="receiptPrintArea" class="print-area">
+      <h3 style="text-align:center;margin-bottom:2px;">ARENSI</h3>
+      <p style="text-align:center;font-size:12px;color:var(--brown-500);margin-bottom:12px;">Struk Transaksi</p>
+      <div id="receiptBody"></div>
+    </div>
+    <button class="btn btn-primary btn-block no-print" style="margin-top:14px;" onclick="window.print()">Print / Simpan PDF</button>
+    <button class="btn btn-secondary btn-block no-print" style="margin-top:8px;" onclick="closeReceipt()">Tutup</button>
   </div>
 </div>
 
