@@ -39,7 +39,7 @@ async function requireAuth(allowedRoles) {
 
 function applyRoleUI() {
   if (currentRole === 'owner') {
-    document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+    document.querySelectorAll('.owner-only').forEach(el => el.classList.remove('owner-only'));
   }
 }
 
