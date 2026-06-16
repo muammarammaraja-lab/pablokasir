@@ -25,7 +25,7 @@ function addToCart(productId) {
   if (!p || p.stok <= 0) return;
   const existing = cart.find(c => c.product_id === productId);
   if (existing) {
-    if (existing.qty + 1 > p.stok) { alert('Stok tidak cukup'); return; }
+    if (existing.qty + 1 > p.stok) { showToast('Stok tidak cukup', 'danger'); return; }
     existing.qty += 1;
   } else {
     cart.push({
@@ -51,7 +51,7 @@ function changeQty(productId, delta) {
   if (!item) return;
   const newQty = Math.round((item.qty + delta) * 100) / 100;
   if (newQty <= 0) { removeFromCart(productId); return; }
-  if (newQty > item.stok) { alert('Stok tidak cukup'); return; }
+  if (newQty > item.stok) { showToast('Stok tidak cukup', 'danger'); return; }
   item.qty = newQty;
   updateCartPricing();
   renderCart();
@@ -62,7 +62,7 @@ function setQty(productId, val) {
   if (!item) return;
   const newQty = parseFloat(val) || 0;
   if (newQty <= 0) { removeFromCart(productId); return; }
-  if (newQty > item.stok) { alert('Stok tidak cukup'); renderCart(); return; }
+  if (newQty > item.stok) { showToast('Stok tidak cukup', 'danger'); renderCart(); return; }
   item.qty = newQty;
   updateCartPricing();
   renderCart();
@@ -148,7 +148,7 @@ async function checkout() {
   });
 
   if (error) {
-    alert('Transaksi gagal: ' + error.message);
+    showToast('Transaksi gagal: ' + error.message, 'danger');
     btn.disabled = false;
     btn.textContent = 'Selesaikan transaksi';
     return;

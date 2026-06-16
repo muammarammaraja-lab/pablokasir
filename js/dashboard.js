@@ -64,7 +64,8 @@ async function submitExpense(e) {
     deskripsi: document.getElementById('expDeskripsi').value,
   };
   const { error } = await sb.from('expenses').insert(payload);
-  if (error) { alert('Gagal menyimpan: ' + error.message); return; }
+  if (error) { showToast('Gagal menyimpan: ' + error.message, 'danger'); return; }
+  showToast('Pengeluaran berhasil disimpan', 'success');
   document.getElementById('expenseForm').reset();
   await loadDashboard(currentPeriode);
 }

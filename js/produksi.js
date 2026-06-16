@@ -19,8 +19,50 @@ function renderProductTable() {
       <td>${p.harga_grosir ? formatRupiah(p.harga_grosir) + ' (min ' + p.min_qty_grosir + ' ' + p.satuan + ')' : '-'}</td>
       <td>${p.stok} ${p.satuan}${p.stok <= p.stok_minimum ? '<span class="badge badge-low">Menipis</span>' : '<span class="badge badge-ok">Aman</span>'}</td>
       <td><button class="btn btn-secondary" onclick="editProduct('${p.id}')">Edit</button></td>
+      <td><button class="btn-icon-only" onclick="deleteProduct('${p.id}')">Hapus</button></td>
     </tr>
-  `).join('') : '<tr><td colspan="7" style="color:var(--brown-500);">Belum ada produk, tambahkan lewat form di atas</td></tr>';
+  `).join('') : '<tr class="muted-row"><td colspan="8">Belum ada produk, tambahkan lewat form di atas</td></tr>';
+  renderStats();
+}
+
+function renderStats() {
+  const grid = document.getElementById('statGrid');
+  const jumlahProduk = productsList.length;
+  const stokMenipis = productsList.filter(p => p.stok <= p.stok_minimum).length;
+  const nilaiStok = productsList.reduce((sum, p) => sum + Number(p.stok) * Number(p.harga_beli), 0);
+  grid.innerHTML = `
+    <div class="stat-card profit">
+      <div class="label">Jumlah Produk</div>
+      <div class="value">${jumlahProduk}</div>
+    </div>
+    <div class="stat-card ${stokMenipis > 0 ? 'expense' : 'income'}">
+      <div class="label">Produk Stok Menipis</div>
+      <div class="value">${stokMenipis}</div>
+    </div>
+    <div class="stat-card income">
+      <div class="label">Nilai Stok (berdasarkan HPP)</div>
+      <div class="value">${formatRupiah(nilaiStok)}</div>
+    </div>
+  `;
+}
+
+async function deleteProduct(id) {
+  const p = productsList.find(x => x.id === id);
+  if (!p) return;
+  const ok = await confirmDialog(`Hapus produk "${p.nama_produk}"? Tindakan ini tidak bisa dibatalkan.`);
+  if (!ok) return;
+
+  const { error } = await sb.from('products').delete().eq('id', id);
+  if (error) {
+    if (error.code === '23503') {
+      showToast('Produk ini sudah punya riwayat transaksi/produksi, tidak bisa dihapus', 'danger');
+    } else {
+      showToast('Gagal menghapus: ' + error.message, 'danger');
+    }
+    return;
+  }
+  showToast('Produk berhasil dihapus', 'success');
+  await loadProductsList();
 }
 
 function renderProduksiSelect() {
@@ -48,7 +90,8 @@ async function submitProduk(e) {
     ({ error } = await sb.from('products').insert(payload));
   }
 
-  if (error) { alert('Gagal menyimpan produk: ' + error.message); return; }
+  if (error) { showToast('Gagal menyimpan produk: ' + error.message, 'danger'); return; }
+  showToast(id ? 'Produk berhasil diperbarui' : 'Produk baru berhasil ditambahkan', 'success');
   resetProdukForm();
   await loadProductsList();
 }
@@ -81,7 +124,8 @@ async function submitProduksi(e) {
   const catatan = document.getElementById('catatanProduksi').value;
 
   if (!product_id) { alert('Tambahkan produk dulu sebelum mencatat produksi'); return; }
-  if (qty_hasil <= 0) { alert('Qty hasil produksi harus lebih dari 0'); return; }
+  if (!product_id) { showToast('Tambahkan produk dulu sebelum mencatat produksi', 'danger'); return; }
+  if (qty_hasil <= 0) { showToast('Qty hasil produksi harus lebih dari 0', 'danger'); return; }
 
   const { error } = await sb.rpc('process_produksi', {
     p_product_id: product_id,
@@ -91,12 +135,12 @@ async function submitProduksi(e) {
     p_catatan: catatan
   });
 
-  if (error) { alert('Gagal mencatat produksi: ' + error.message); return; }
+  if (error) { showToast('Gagal mencatat produksi: ' + error.message, 'danger'); return; }
 
   document.getElementById('produksiForm').reset();
   await loadProductsList();
   await loadRecentProduksi();
-  alert('Produksi berhasil dicatat — stok dan HPP sudah diperbarui');
+  showToast('Produksi berhasil dicatat — stok dan HPP sudah diperbarui', 'success');
 }
 
 async function loadRecentProduksi() {
