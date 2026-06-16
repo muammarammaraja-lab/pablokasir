@@ -8,11 +8,14 @@
 </head>
 <body>
 <div class="topbar">
-  <div class="brand">ARENSI <span>POS</span></div>
+  <div class="brand">
+    <svg class="logo-mark" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>ARENSI <span>POS</span>
+  </div>
   <nav>
     <a href="index.html" class="active">Kasir</a>
-    <a href="produksi.html">Produksi &amp; Stok</a>
-    <a href="dashboard.html">Laporan</a>
+    <a href="produksi.html" class="owner-only">Produksi &amp; Stok</a>
+    <a href="dashboard.html" class="owner-only">Laporan</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
   </nav>
 </div>
 
@@ -71,6 +74,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/kasir.js"></script>
 </body>
 </html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masuk — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;">
+  <div class="card" style="width:100%;max-width:340px;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <svg width="32" height="32" viewBox="0 0 20 20" fill="none" style="margin-bottom:8px;"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>
+      <h1 style="font-size:20px;">ARENSI POS</h1>
+      <p class="subtitle" style="margin-bottom:0;">Masuk untuk melanjutkan</p>
+    </div>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" required placeholder="email@contoh.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="btnLogin">Masuk</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('btnLogin');
+  btn.disabled = true;
+  btn.textContent = 'Memproses...';
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    showToast('Login gagal: email atau password salah', 'danger');
+    btn.disabled = false;
+    btn.textContent = 'Masuk';
+    return;
+  }
+
+  window.location.href = 'index.html';
+});
+
+// Kalau sesi masih aktif, langsung lempar ke halaman utama tanpa perlu login ulang
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) window.location.href = 'index.html';
+})();
+</script>
+</body>
+</html>

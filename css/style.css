@@ -153,6 +153,8 @@ td { padding: 10px; border-bottom: 1px solid var(--border); }
 }
 .btn-icon-only:hover { background: var(--red-100); }
 
+.owner-only { display: none; }
+
 /* Responsive: scrollable tables instead of cramped wrapping text */
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .table-wrap table { min-width: 560px; }

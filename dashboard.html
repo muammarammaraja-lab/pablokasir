@@ -13,8 +13,9 @@
   </div>
   <nav>
     <a href="index.html">Kasir</a>
-    <a href="produksi.html">Produksi &amp; Stok</a>
-    <a href="dashboard.html" class="active">Laporan</a>
+    <a href="produksi.html" class="owner-only">Produksi &amp; Stok</a>
+    <a href="dashboard.html" class="owner-only active">Laporan</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
   </nav>
 </div>
 
@@ -107,6 +108,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/dashboard.js"></script>
 </body>
 </html>
