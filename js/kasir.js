@@ -132,6 +132,8 @@ function renderSummary() {
 }
 
 async function checkout() {
+  if (cart.length === 0) { showToast('Keranjang masih kosong', 'danger'); return; }
+
   const total = getTotal();
   const bayar = parseFloat(document.getElementById('uangBayar').value) || 0;
   const metode = document.getElementById('metodeBayar').value;
@@ -180,4 +182,5 @@ function closeReceipt() {
 document.getElementById('uangBayar').addEventListener('input', renderSummary);
 document.getElementById('searchProduct').addEventListener('input', (e) => renderProducts(e.target.value));
 
+renderCart();
 loadProducts();
