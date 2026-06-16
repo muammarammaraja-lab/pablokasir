@@ -153,3 +153,22 @@ td { padding: 10px; border-bottom: 1px solid var(--border); }
   color: var(--red-600); font-size: 13px; font-weight: 600;
 }
 .btn-icon-only:hover { background: var(--red-100); }
+
+/* Responsive: scrollable tables instead of cramped wrapping text */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap table { min-width: 560px; }
+
+/* Responsive topbar for narrow screens */
+@media (max-width: 640px) {
+  .topbar { flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
+  .topbar nav { width: 100%; justify-content: space-between; gap: 2px; }
+  .topbar nav a { padding: 7px 6px; font-size: 12.5px; flex: 1; text-align: center; white-space: nowrap; }
+  .page { padding: 16px; }
+  h1 { font-size: 22px; }
+}
+
+/* Responsive cart item: let it wrap into two rows on very narrow screens */
+@media (max-width: 480px) {
+  .cart-item { flex-wrap: wrap; }
+  .cart-item .info { flex: 1 1 100%; }
+}

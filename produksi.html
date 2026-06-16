@@ -8,7 +8,9 @@
 </head>
 <body>
 <div class="topbar">
-  <div class="brand">ARENSI <span>POS</span></div>
+  <div class="brand">
+    <svg class="logo-mark" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>ARENSI <span>POS</span>
+  </div>
   <nav>
     <a href="index.html">Kasir</a>
     <a href="produksi.html" class="active">Produksi &amp; Stok</a>
@@ -19,6 +21,7 @@
 <div class="page">
   <h1>Produksi &amp; Stok</h1>
   <p class="subtitle">Catat hasil produksi dan kelola daftar produk</p>
+
   <div class="stat-grid" id="statGrid"></div>
 
   <div class="grid-2">
@@ -60,10 +63,12 @@
       </form>
 
       <h3 style="margin-top:24px;">Daftar Produk</h3>
-      <table style="margin-top:10px;">
-        <thead><tr><th>Nama</th><th>Satuan</th><th>HPP</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th></th></tr></thead>
-        <tbody id="productTableBody"></tbody>
-      </table>
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead><tr><th>Nama</th><th>Satuan</th><th>HPP</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th></th><th></th></tr></thead>
+          <tbody id="productTableBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="card">
@@ -94,10 +99,12 @@
       </form>
 
       <h3 style="margin-top:24px;">Riwayat Produksi Terbaru</h3>
-      <table style="margin-top:10px;">
-        <thead><tr><th>Tanggal</th><th>Produk</th><th>Hasil</th><th>Total Biaya</th></tr></thead>
-        <tbody id="produksiHistoryBody"></tbody>
-      </table>
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead><tr><th>Tanggal</th><th>Produk</th><th>Hasil</th><th>Total Biaya</th></tr></thead>
+          <tbody id="produksiHistoryBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
