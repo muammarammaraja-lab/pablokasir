@@ -28,7 +28,10 @@
 
   <div class="grid-2">
     <div class="card">
-      <input type="text" id="searchProduct" placeholder="Cari produk...">
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="searchProduct" placeholder="Cari produk..." style="flex:1;">
+        <button class="btn btn-secondary" type="button" onclick="scanForCart()" style="white-space:nowrap;">Scan</button>
+      </div>
       <div class="product-grid" id="productGrid"></div>
     </div>
 
@@ -74,10 +77,12 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/scanner.js"></script>
 <script src="js/kasir.js"></script>
 </body>
 </html>
