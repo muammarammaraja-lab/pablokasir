@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #FAF6EF;
+  --bg-card: #FFFFFF;
+  --bg-tan: #F1E7D8;
+  --brown-900: #3D2817;
+  --brown-700: #5C4530;
+  --brown-500: #8A7259;
+  --amber-600: #A8631E;
+  --amber-700: #8B4F18;
+  --amber-100: #F6E8D6;
+  --green-600: #5B7A4D;
+  --green-100: #E7EEDF;
+  --red-600: #B5483D;
+  --red-100: #FBE7E4;
+  --border: #E3D9C6;
+  --radius: 10px;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--brown-900);
+  line-height: 1.5;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: var(--brown-900);
+  color: #F1E7D8;
+}
+.topbar .brand { font-family: var(--font-display); font-size: 20px; font-weight: 600; letter-spacing: .3px; }
+.topbar .brand span { color: var(--amber-600); }
+.topbar nav { display: flex; gap: 6px; }
+.topbar nav a {
+  color: #E3D9C6; text-decoration: none; padding: 8px 14px; border-radius: 8px;
+  font-size: 14px; font-weight: 500; transition: background .15s;
+}
+.topbar nav a:hover, .topbar nav a.active { background: rgba(255,255,255,0.12); color: #fff; }
+
+.page { max-width: 1180px; margin: 0 auto; padding: 24px; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; color: var(--brown-900); }
+h1 { font-size: 26px; margin-bottom: 4px; }
+.subtitle { color: var(--brown-500); font-size: 14px; margin-bottom: 24px; }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+
+.grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+@media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 12px; margin-top: 12px; }
+.product-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; background: var(--bg-card); transition: border-color .15s, transform .1s; }
+.product-card:hover { border-color: var(--amber-600); transform: translateY(-1px); }
+.product-card.out { opacity: .5; cursor: not-allowed; }
+.product-card .nama { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.product-card .harga { color: var(--amber-700); font-weight: 600; font-size: 13px; }
+.product-card .stok { font-size: 12px; color: var(--brown-500); margin-top: 4px; }
+.product-card .stok.low { color: var(--red-600); font-weight: 600; }
+
+.cart-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.cart-item:last-child { border-bottom: none; }
+.cart-item .info { flex: 1; }
+.cart-item .info .nama { font-weight: 500; font-size: 13px; margin-bottom: 4px; }
+.qty-control { display: flex; align-items: center; gap: 4px; }
+.qty-control button { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-tan); cursor: pointer; font-size: 14px; }
+.qty-control input { width: 54px; text-align: center; border: 1px solid var(--border); border-radius: 6px; padding: 4px; font-size: 13px; }
+
+.total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+.total-row.grand { font-size: 18px; font-weight: 700; border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
+
+input, select, textarea {
+  font-family: var(--font-body); border: 1px solid var(--border); border-radius: 8px;
+  padding: 9px 12px; font-size: 14px; width: 100%; background: #fff; color: var(--brown-900);
+}
+label { font-size: 13px; font-weight: 500; color: var(--brown-700); display: block; margin-bottom: 4px; }
+.field { margin-bottom: 14px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 8px;
+  padding: 11px 18px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-body);
+  transition: opacity .15s; margin-right: 6px;
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-primary { background: var(--amber-600); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--amber-700); }
+.btn-secondary { background: var(--bg-tan); color: var(--brown-900); }
+.btn-block { width: 100%; margin-right: 0; }
+
+.alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; }
+.alert-danger { background: var(--red-100); color: var(--red-600); }
+.alert-success { background: var(--green-100); color: var(--green-600); }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+.badge-low { background: var(--red-100); color: var(--red-600); }
+.badge-ok { background: var(--green-100); color: var(--green-600); }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 10px; color: var(--brown-500); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+td { padding: 10px; border-bottom: 1px solid var(--border); }
+
+.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+@media (max-width: 760px) { .stat-grid { grid-template-columns: 1fr; } }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.stat-card .label { font-size: 13px; color: var(--brown-500); margin-bottom: 6px; }
+.stat-card .value { font-family: var(--font-display); font-size: 26px; font-weight: 600; }
+.stat-card.income .value { color: var(--green-600); }
+.stat-card.expense .value { color: var(--red-600); }
+.stat-card.profit .value { color: var(--amber-700); }
+
+.filter-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: end; }
+.filter-bar .field { margin-bottom: 0; min-width: 160px; }

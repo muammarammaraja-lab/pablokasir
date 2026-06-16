@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasir — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">ARENSI <span>POS</span></div>
+  <nav>
+    <a href="index.html" class="active">Kasir</a>
+    <a href="produksi.html">Produksi &amp; Stok</a>
+    <a href="dashboard.html">Laporan</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Kasir</h1>
+  <p class="subtitle">Pilih produk, lalu selesaikan pembayaran</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <input type="text" id="searchProduct" placeholder="Cari produk...">
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Keranjang</h3>
+      <div id="cartItems"></div>
+      <div id="cartAlert"></div>
+
+      <div class="total-row grand">
+        <span>Total Belanja</span>
+        <span id="totalBelanja">Rp 0</span>
+      </div>
+
+      <div class="field" style="margin-top:14px;">
+        <label>Metode Pembayaran</label>
+        <select id="metodeBayar">
+          <option value="Cash">Cash</option>
+          <option value="QRIS">QRIS</option>
+          <option value="Transfer">Transfer</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Uang Bayar</label>
+        <input type="number" id="uangBayar" placeholder="0">
+      </div>
+
+      <div class="total-row">
+        <span>Kembalian</span>
+        <strong id="uangKembalian">Rp 0</strong>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="btnCheckout" onclick="checkout()" disabled style="margin-top:10px;">Selesaikan transaksi</button>
+    </div>
+  </div>
+</div>
+
+<div id="receiptModal" style="display:none;position:fixed;inset:0;background:rgba(61,40,23,0.55);align-items:center;justify-content:center;z-index:50;">
+  <div class="card" style="width:320px;max-height:80vh;overflow:auto;">
+    <h3 style="margin-bottom:6px;">Struk Transaksi</h3>
+    <div id="receiptBody"></div>
+    <button class="btn btn-secondary btn-block" style="margin-top:14px;" onclick="closeReceipt()">Tutup</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/kasir.js"></script>
+</body>
+</html>

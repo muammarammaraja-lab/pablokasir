@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produksi & Stok — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">ARENSI <span>POS</span></div>
+  <nav>
+    <a href="index.html">Kasir</a>
+    <a href="produksi.html" class="active">Produksi &amp; Stok</a>
+    <a href="dashboard.html">Laporan</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Produksi &amp; Stok</h1>
+  <p class="subtitle">Catat hasil produksi dan kelola daftar produk</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 id="produkFormTitle">Tambah Produk Baru</h3>
+      <form id="produkForm" style="margin-top:14px;">
+        <input type="hidden" id="productId">
+        <div class="field">
+          <label>Nama Produk</label>
+          <input type="text" id="namaProduk" required placeholder="Gula Aren Cetak">
+        </div>
+        <div class="field">
+          <label>Satuan</label>
+          <select id="satuan">
+            <option value="kg">kg</option>
+            <option value="pack">pack</option>
+            <option value="sachet">sachet</option>
+            <option value="pcs">pcs</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Harga Jual (Eceran)</label>
+          <input type="number" id="hargaJual" required placeholder="0">
+        </div>
+        <div class="field">
+          <label>Harga Grosir (opsional)</label>
+          <input type="number" id="hargaGrosir" placeholder="0">
+        </div>
+        <div class="field">
+          <label>Minimal Qty untuk Harga Grosir</label>
+          <input type="number" id="minQtyGrosir" placeholder="10">
+        </div>
+        <div class="field">
+          <label>Stok Minimum (alert menipis)</label>
+          <input type="number" id="stokMinimum" placeholder="5">
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+        <button type="button" class="btn btn-secondary" onclick="resetProdukForm()">Batal</button>
+      </form>
+
+      <h3 style="margin-top:24px;">Daftar Produk</h3>
+      <table style="margin-top:10px;">
+        <thead><tr><th>Nama</th><th>Satuan</th><th>HPP</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th></th></tr></thead>
+        <tbody id="productTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Catat Produksi Baru</h3>
+      <p class="subtitle" style="margin-bottom:14px;">Nira yang diolah jadi gula akan otomatis menambah stok &amp; mencatat pengeluaran</p>
+      <form id="produksiForm">
+        <div class="field">
+          <label>Produk</label>
+          <select id="produksiProduct"></select>
+        </div>
+        <div class="field">
+          <label>Qty Hasil Produksi</label>
+          <input type="number" step="0.01" id="qtyHasil" required placeholder="0">
+        </div>
+        <div class="field">
+          <label>Biaya Bahan Mentah (nira)</label>
+          <input type="number" id="biayaBahan" required placeholder="0">
+        </div>
+        <div class="field">
+          <label>Biaya Produksi (tenaga, kayu bakar, kemasan)</label>
+          <input type="number" id="biayaProduksi" required placeholder="0">
+        </div>
+        <div class="field">
+          <label>Catatan (opsional)</label>
+          <input type="text" id="catatanProduksi" placeholder="Batch produksi pagi ini">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Catat Produksi</button>
+      </form>
+
+      <h3 style="margin-top:24px;">Riwayat Produksi Terbaru</h3>
+      <table style="margin-top:10px;">
+        <thead><tr><th>Tanggal</th><th>Produk</th><th>Hasil</th><th>Total Biaya</th></tr></thead>
+        <tbody id="produksiHistoryBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/produksi.js"></script>
+</body>
+</html>

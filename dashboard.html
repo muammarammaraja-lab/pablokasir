@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Keuangan — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">ARENSI <span>POS</span></div>
+  <nav>
+    <a href="index.html">Kasir</a>
+    <a href="produksi.html">Produksi &amp; Stok</a>
+    <a href="dashboard.html" class="active">Laporan</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Laporan Keuangan</h1>
+  <p class="subtitle">Pantau pendapatan, pengeluaran, dan laba ARENSI</p>
+
+  <div class="filter-bar">
+    <div class="field">
+      <label>Periode</label>
+      <select id="filterPeriode">
+        <option value="hari">Hari ini</option>
+        <option value="bulan" selected>Bulan ini</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card income">
+      <div class="label">Total Pendapatan</div>
+      <div class="value" id="statPendapatan">Rp 0</div>
+    </div>
+    <div class="stat-card expense">
+      <div class="label">Total Pengeluaran</div>
+      <div class="value" id="statPengeluaran">Rp 0</div>
+    </div>
+    <div class="stat-card profit">
+      <div class="label">Laba / Rugi Bersih</div>
+      <div class="value" id="statLaba">Rp 0</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Breakdown Pengeluaran per Kategori</h3>
+      <table style="margin-top:12px;">
+        <thead><tr><th>Kategori</th><th style="text-align:right;">Nominal</th></tr></thead>
+        <tbody id="breakdownBody"></tbody>
+      </table>
+
+      <h3 style="margin-top:24px;">Catat Pengeluaran Manual</h3>
+      <p class="subtitle" style="margin-bottom:14px;">Untuk biaya operasional, gaji, atau lainnya yang tidak terkait produksi</p>
+      <form id="expenseForm">
+        <div class="field">
+          <label>Kategori</label>
+          <select id="expKategori">
+            <option>Operasional Toko</option>
+            <option>Gaji</option>
+            <option>Modal Bahan Mentah</option>
+            <option>Biaya Produksi</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Nominal</label>
+          <input type="number" id="expNominal" required placeholder="0">
+        </div>
+        <div class="field">
+          <label>Deskripsi</label>
+          <input type="text" id="expDeskripsi" placeholder="Bayar listrik bulan ini">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Simpan Pengeluaran</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Laba Kotor per Produk</h3>
+      <p class="subtitle" style="margin-bottom:10px;">Berdasarkan periode terpilih di atas</p>
+      <table>
+        <thead><tr><th>Produk</th><th>Terjual</th><th>Omzet</th><th>Laba Kotor</th></tr></thead>
+        <tbody id="marginBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
