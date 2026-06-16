@@ -43,7 +43,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const { error } = await sb.auth.signInWithPassword({ email, password });
 
   if (error) {
-    showToast('Login gagal: email atau password salah', 'danger');
+    showToast('Login gagal: ' + error.message, 'danger');
     btn.disabled = false;
     btn.textContent = 'Masuk';
     return;
