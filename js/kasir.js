@@ -182,6 +182,15 @@ function closeReceipt() {
   document.getElementById('receiptModal').style.display = 'none';
 }
 
+function scanForCart() {
+  openScanner((code) => {
+    const p = products.find(x => x.barcode === code);
+    if (!p) { showToast('Barcode tidak dikenali: ' + code, 'danger'); return; }
+    addToCart(p.id);
+    showToast(`${p.nama_produk} ditambahkan ke keranjang`, 'success');
+  });
+}
+
 document.getElementById('uangBayar').addEventListener('input', renderSummary);
 document.getElementById('searchProduct').addEventListener('input', (e) => renderProducts(e.target.value));
 

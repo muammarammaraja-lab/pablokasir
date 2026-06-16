@@ -18,10 +18,11 @@ function renderProductTable() {
       <td>${formatRupiah(p.harga_jual)}</td>
       <td>${p.harga_grosir ? formatRupiah(p.harga_grosir) + ' (min ' + p.min_qty_grosir + ' ' + p.satuan + ')' : '-'}</td>
       <td>${p.stok} ${p.satuan}${p.stok <= p.stok_minimum ? '<span class="badge badge-low">Menipis</span>' : '<span class="badge badge-ok">Aman</span>'}</td>
+      <td style="font-size:12px;color:var(--brown-500);">${p.barcode || '-'}</td>
       <td><button class="btn btn-secondary" onclick="editProduct('${p.id}')">Edit</button></td>
       <td><button class="btn-icon-only" onclick="deleteProduct('${p.id}')">Arsipkan</button></td>
     </tr>
-  `).join('') : '<tr class="muted-row"><td colspan="8">Belum ada produk, tambahkan lewat form di atas</td></tr>';
+  `).join('') : '<tr class="muted-row"><td colspan="9">Belum ada produk, tambahkan lewat form di atas</td></tr>';
   renderStats();
 }
 
@@ -114,6 +115,7 @@ async function submitProduk(e) {
     harga_grosir: parseFloat(document.getElementById('hargaGrosir').value) || null,
     min_qty_grosir: parseFloat(document.getElementById('minQtyGrosir').value) || null,
     stok_minimum: parseFloat(document.getElementById('stokMinimum').value) || 5,
+    barcode: document.getElementById('barcodeProduk').value.trim() || null,
   };
 
   let error;
@@ -124,10 +126,24 @@ async function submitProduk(e) {
     ({ error } = await sb.from('products').insert(payload));
   }
 
-  if (error) { showToast('Gagal menyimpan produk: ' + error.message, 'danger'); return; }
+  if (error) {
+    if (error.code === '23505') {
+      showToast('Barcode ini sudah dipakai produk lain', 'danger');
+    } else {
+      showToast('Gagal menyimpan produk: ' + error.message, 'danger');
+    }
+    return;
+  }
   showToast(id ? 'Produk berhasil diperbarui' : 'Produk baru berhasil ditambahkan', 'success');
   resetProdukForm();
   await loadProductsList();
+}
+
+function scanForProductForm() {
+  openScanner((code) => {
+    document.getElementById('barcodeProduk').value = code;
+    showToast('Barcode terbaca: ' + code, 'success');
+  });
 }
 
 function editProduct(id) {
@@ -140,6 +156,7 @@ function editProduct(id) {
   document.getElementById('hargaGrosir').value = p.harga_grosir || '';
   document.getElementById('minQtyGrosir').value = p.min_qty_grosir || '';
   document.getElementById('stokMinimum').value = p.stok_minimum;
+  document.getElementById('barcodeProduk').value = p.barcode || '';
   document.getElementById('produkFormTitle').textContent = 'Edit Produk';
 }
 
