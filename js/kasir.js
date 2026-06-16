@@ -2,7 +2,7 @@ let products = [];
 let cart = [];
 
 async function loadProducts() {
-  const { data, error } = await sb.from('products').select('*').order('nama_produk');
+  const { data, error } = await sb.from('products').select('*').is('deleted_at', null).order('nama_produk');
   if (error) { console.error(error); return; }
   products = data;
   renderProducts(document.getElementById('searchProduct').value);

@@ -1,7 +1,7 @@
 let productsList = [];
 
 async function loadProductsList() {
-  const { data, error } = await sb.from('products').select('*').order('nama_produk');
+  const { data, error } = await sb.from('products').select('*').is('deleted_at', null).order('nama_produk');
   if (error) { console.error(error); return; }
   productsList = data;
   renderProductTable();
@@ -19,7 +19,7 @@ function renderProductTable() {
       <td>${p.harga_grosir ? formatRupiah(p.harga_grosir) + ' (min ' + p.min_qty_grosir + ' ' + p.satuan + ')' : '-'}</td>
       <td>${p.stok} ${p.satuan}${p.stok <= p.stok_minimum ? '<span class="badge badge-low">Menipis</span>' : '<span class="badge badge-ok">Aman</span>'}</td>
       <td><button class="btn btn-secondary" onclick="editProduct('${p.id}')">Edit</button></td>
-      <td><button class="btn-icon-only" onclick="deleteProduct('${p.id}')">Hapus</button></td>
+      <td><button class="btn-icon-only" onclick="deleteProduct('${p.id}')">Arsipkan</button></td>
     </tr>
   `).join('') : '<tr class="muted-row"><td colspan="8">Belum ada produk, tambahkan lewat form di atas</td></tr>';
   renderStats();
@@ -49,19 +49,52 @@ function renderStats() {
 async function deleteProduct(id) {
   const p = productsList.find(x => x.id === id);
   if (!p) return;
-  const ok = await confirmDialog(`Hapus produk "${p.nama_produk}"? Tindakan ini tidak bisa dibatalkan.`);
+  const ok = await confirmDialog(
+    `Arsipkan produk "${p.nama_produk}"? Produk ini akan disembunyikan dari Kasir & daftar produksi, tapi riwayat transaksinya tetap aman dan bisa dipulihkan kapan saja lewat "Lihat produk diarsipkan".`,
+    'Arsipkan'
+  );
   if (!ok) return;
 
-  const { error } = await sb.from('products').delete().eq('id', id);
-  if (error) {
-    if (error.code === '23503') {
-      showToast('Produk ini sudah punya riwayat transaksi/produksi, tidak bisa dihapus', 'danger');
-    } else {
-      showToast('Gagal menghapus: ' + error.message, 'danger');
-    }
-    return;
+  const { error } = await sb.from('products').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+  if (error) { showToast('Gagal mengarsipkan: ' + error.message, 'danger'); return; }
+  showToast('Produk berhasil diarsipkan', 'success');
+  await loadProductsList();
+}
+
+let archivedShown = false;
+
+async function toggleArchived() {
+  const section = document.getElementById('archivedSection');
+  const btn = document.getElementById('toggleArchivedBtn');
+  archivedShown = !archivedShown;
+  if (archivedShown) {
+    await loadArchived();
+    section.style.display = 'block';
+    btn.textContent = 'Sembunyikan produk diarsipkan';
+  } else {
+    section.style.display = 'none';
+    btn.textContent = 'Lihat produk diarsipkan';
   }
-  showToast('Produk berhasil dihapus', 'success');
+}
+
+async function loadArchived() {
+  const { data, error } = await sb.from('products').select('*').not('deleted_at', 'is', null).order('deleted_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  document.getElementById('archivedTableBody').innerHTML = data.length ? data.map(p => `
+    <tr>
+      <td>${p.nama_produk}</td>
+      <td>${p.satuan}</td>
+      <td>${formatTanggal(p.deleted_at)}</td>
+      <td><button class="btn btn-secondary" onclick="restoreProduct('${p.id}')">Pulihkan</button></td>
+    </tr>
+  `).join('') : '<tr class="muted-row"><td colspan="4">Belum ada produk yang diarsipkan</td></tr>';
+}
+
+async function restoreProduct(id) {
+  const { error } = await sb.from('products').update({ deleted_at: null }).eq('id', id);
+  if (error) { showToast('Gagal memulihkan: ' + error.message, 'danger'); return; }
+  showToast('Produk berhasil dipulihkan', 'success');
+  await loadArchived();
   await loadProductsList();
 }
 
