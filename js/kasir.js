@@ -143,7 +143,7 @@ async function checkout() {
 
   const items = cart.map(c => ({ product_id: c.product_id, qty: c.qty, harga_satuan: c.harga_satuan }));
 
-  const { error } = await sb.rpc('process_sale', {
+  const { data, error } = await sb.rpc('process_sale', {
     p_items: items,
     p_uang_bayar: bayar,
     p_metode: metode
@@ -156,7 +156,9 @@ async function checkout() {
     return;
   }
 
-  showReceipt({ total, bayar, kembalian: bayar - total, metode, items: [...cart] });
+  const nomorTransaksi = data?.[0]?.nomor_transaksi || '';
+
+  showReceipt({ nomorTransaksi, total, bayar, kembalian: bayar - total, metode, items: [...cart] });
   cart = [];
   document.getElementById('uangBayar').value = '';
   renderCart();
@@ -166,6 +168,7 @@ async function checkout() {
 
 function showReceipt(trx) {
   document.getElementById('receiptBody').innerHTML = `
+    ${trx.nomorTransaksi ? `<p style="font-weight:600;font-size:13px;margin-bottom:2px;">${trx.nomorTransaksi}</p>` : ''}
     <p style="color:var(--brown-500);font-size:13px;margin-bottom:10px;">${new Date().toLocaleString('id-ID')}</p>
     ${trx.items.map(i => `<div class="total-row"><span>${i.nama_produk} x${i.qty}</span><span>${formatRupiah(i.qty * i.harga_satuan)}</span></div>`).join('')}
     <div class="total-row grand"><span>Total</span><span>${formatRupiah(trx.total)}</span></div>
