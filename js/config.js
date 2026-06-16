@@ -1,6 +1,4 @@
-// Ganti dua nilai di bawah dengan punya project Supabase kamu sendiri
-// (Project Settings > API di dashboard Supabase)
-const SUPABASE_URL = "https://kyfeyucsspfgyajsqhtp.supabase.co;
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5ZmV5dWNzc3BmZ3lhanNxaHRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1OTc4MjQsImV4cCI6MjA5NzE3MzgyNH0.XlV8_qQq54hrQ7ssodQAIfTdg9onvYsbv7BgPOU7Czc";
+const SUPABASE_URL = "ISI_URL_SUPABASE_KAMU_DI_SINI";
+const SUPABASE_ANON_KEY = "ISI_ANON_KEY_KAMU_DI_SINI";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
