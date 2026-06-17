@@ -27,6 +27,7 @@ body {
   background: var(--bg);
   color: var(--brown-900);
   line-height: 1.5;
+  overflow-x: hidden;
 }
 
 .topbar {
@@ -108,9 +109,9 @@ th { text-align: left; padding: 8px 10px; color: var(--brown-500); font-weight: 
 td { padding: 10px; border-bottom: 1px solid var(--border); }
 
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; margin-bottom: 20px; }
-.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; min-width: 0; overflow: hidden; }
 .stat-card .label { font-size: 13px; color: var(--brown-500); margin-bottom: 6px; }
-.stat-card .value { font-family: var(--font-display); font-size: 26px; font-weight: 600; }
+.stat-card .value { font-family: var(--font-display); font-size: 26px; font-weight: 600; overflow-wrap: break-word; word-break: break-word; }
 .stat-card.income .value { color: var(--green-600); }
 .stat-card.expense .value { color: var(--red-600); }
 .stat-card.profit .value { color: var(--amber-700); }
@@ -197,4 +198,6 @@ td { padding: 10px; border-bottom: 1px solid var(--border); }
 @media (max-width: 480px) {
   .cart-item { flex-wrap: wrap; }
   .cart-item .info { flex: 1 1 100%; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .stat-card .value { font-size: 22px; }
 }
