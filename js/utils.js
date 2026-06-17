@@ -59,3 +59,18 @@ async function applyCustomLogo() {
     }
   } catch (e) { /* gagal ambil setting logo, biarkan logo default tetap tampil */ }
 }
+
+function toggleNav() {
+  const nav = document.querySelector('.topbar nav');
+  if (nav) nav.classList.toggle('nav-open');
+}
+
+// Tutup menu otomatis kalau klik di luar nav (termasuk setelah pilih menu)
+document.addEventListener('click', (e) => {
+  const nav = document.querySelector('.topbar nav');
+  const toggleBtn = document.querySelector('.nav-toggle');
+  if (!nav || !nav.classList.contains('nav-open')) return;
+  if (nav.contains(e.target) && e.target.tagName !== 'A') return;
+  if (toggleBtn && toggleBtn.contains(e.target)) return;
+  nav.classList.remove('nav-open');
+});
