@@ -52,9 +52,10 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; color: var(--br
 h1 { font-size: 26px; margin-bottom: 4px; }
 .subtitle { color: var(--brown-500); font-size: 14px; margin-bottom: 24px; }
 
-.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; min-width: 0; }
 
-.grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+.grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; min-width: 0; }
+.grid-2 > * { min-width: 0; }
 @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
 
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 12px; margin-top: 12px; }
