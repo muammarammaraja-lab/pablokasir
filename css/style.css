@@ -22,12 +22,19 @@
   --font-body: 'Inter', system-ui, sans-serif;
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   font-family: var(--font-body);
   background: var(--bg);
   color: var(--brown-900);
   line-height: 1.5;
   overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
 }
 
 .topbar {
@@ -47,7 +54,7 @@ body {
 }
 .topbar nav a:hover, .topbar nav a.active { background: rgba(255,255,255,0.12); color: #fff; }
 
-.page { max-width: 1180px; margin: 0 auto; padding: 24px; }
+.page { max-width: 1180px; width: 100%; margin: 0 auto; padding: 24px; box-sizing: border-box; }
 
 h1, h2, h3 { font-family: var(--font-display); font-weight: 600; color: var(--brown-900); }
 h1 { font-size: 26px; margin-bottom: 4px; }
@@ -166,7 +173,7 @@ td { padding: 10px; border-bottom: 1px solid var(--border); }
 .nav-toggle { display: none; background: none; border: none; color: #F1E7D8; font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1; }
 
 /* Responsive: scrollable tables instead of cramped wrapping text */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; max-width: 100%; }
 .table-wrap table { min-width: 560px; }
 
 /* Hamburger nav for narrow/medium screens — too many menu items to fit in a row anymore */
