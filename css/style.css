@@ -22,19 +22,11 @@
   --font-body: 'Inter', system-ui, sans-serif;
 }
 
-html {
-  overflow-x: hidden;
-  max-width: 100%;
-}
-
 body {
   font-family: var(--font-body);
   background: var(--bg);
   color: var(--brown-900);
   line-height: 1.5;
-  overflow-x: hidden;
-  max-width: 100%;
-  width: 100%;
 }
 
 .topbar {
