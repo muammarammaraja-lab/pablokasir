@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manajemen User — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <svg class="logo-mark" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>ARENSI <span>POS</span>
+  </div>
+  <nav>
+    <a href="index.html">Kasir</a>
+    <a href="produksi.html" class="owner-only">Produksi &amp; Stok</a>
+    <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
+    <a href="supplier.html" class="owner-only">Supplier &amp; PO</a>
+    <a href="riwayat.html" class="owner-only">Riwayat</a>
+    <a href="users.html" class="owner-only active">User</a>
+    <a href="dashboard.html" class="owner-only">Laporan</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Manajemen User</h1>
+  <p class="subtitle">Tambah akun Owner atau Kasir baru, dan lihat daftar user yang sudah ada</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Tambah User Baru</h3>
+      <form id="userForm" style="margin-top:14px;">
+        <div class="field">
+          <label>Nama</label>
+          <input type="text" id="userNama" placeholder="Nama lengkap">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="userEmail" required placeholder="email@contoh.com">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="text" id="userPassword" required placeholder="Minimal 6 karakter">
+        </div>
+        <div class="field">
+          <label>Role</label>
+          <select id="userRole">
+            <option value="kasir">Kasir</option>
+            <option value="owner">Owner</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Buat User</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Daftar User</h3>
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Dibuat</th></tr></thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/users.js"></script>
+</body>
+</html>
