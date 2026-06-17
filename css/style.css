@@ -162,15 +162,33 @@ td { padding: 10px; border-bottom: 1px solid var(--border); }
   .no-print { display: none !important; }
 }
 
+.nav-toggle { display: none; background: none; border: none; color: #F1E7D8; font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1; }
+
 /* Responsive: scrollable tables instead of cramped wrapping text */
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .table-wrap table { min-width: 560px; }
 
-/* Responsive topbar for narrow screens */
-@media (max-width: 640px) {
-  .topbar { flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
-  .topbar nav { width: 100%; justify-content: space-between; gap: 2px; }
-  .topbar nav a { padding: 7px 6px; font-size: 12.5px; flex: 1; text-align: center; white-space: nowrap; }
+/* Hamburger nav for narrow/medium screens — too many menu items to fit in a row anymore */
+@media (max-width: 1024px) {
+  .nav-toggle { display: block; }
+  .topbar { position: relative; }
+  .topbar nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--brown-900);
+    padding: 8px 16px 16px;
+    gap: 2px;
+    z-index: 100;
+    box-shadow: 0 10px 24px rgba(0,0,0,.3);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .topbar nav.nav-open { display: flex; }
+  .topbar nav a { flex: none; text-align: left; padding: 11px 12px; font-size: 14px; }
   .page { padding: 16px; }
   h1 { font-size: 22px; }
 }
