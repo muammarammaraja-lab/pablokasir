@@ -11,7 +11,11 @@ async function loadDashboard(periode = currentPeriode) {
   const startIso = getStartDate(periode).toISOString();
 
   const { data: sales } = await sb.from('sales').select('total_belanja').gte('tanggal', startIso);
-  const totalPendapatan = (sales || []).reduce((s, r) => s + Number(r.total_belanja), 0);
+  const totalPendapatanKotor = (sales || []).reduce((s, r) => s + Number(r.total_belanja), 0);
+
+  const { data: returData } = await sb.from('retur').select('nominal_pengembalian').gte('tanggal', startIso);
+  const totalRetur = (returData || []).reduce((s, r) => s + Number(r.nominal_pengembalian), 0);
+  const totalPendapatan = totalPendapatanKotor - totalRetur;
 
   const { data: expenses } = await sb.from('expenses').select('kategori, nominal').gte('tanggal', startIso);
 
@@ -167,7 +171,7 @@ function exportCSV() {
 async function backupAllData() {
   showToast('Menyiapkan backup, mohon tunggu...', 'success');
   try {
-    const tables = ['products', 'bahan_baku', 'resep', 'sales', 'sale_items', 'produksi', 'expenses', 'stok_log'];
+    const tables = ['products', 'bahan_baku', 'resep', 'suppliers', 'sales', 'sale_items', 'produksi', 'purchase_orders', 'expenses', 'stok_log', 'retur'];
     const result = {};
     for (const t of tables) {
       const { data, error } = await sb.from(t).select('*');
@@ -188,6 +192,50 @@ async function backupAllData() {
   } catch (err) {
     showToast('Gagal membuat backup: ' + err.message, 'danger');
   }
+}
+
+async function getAccessToken() {
+  const { data: { session } } = await sb.auth.getSession();
+  return session?.access_token;
+}
+
+async function restoreFromBackup() {
+  const fileInput = document.getElementById('restoreFile');
+  const confirmText = document.getElementById('restoreConfirm').value.trim();
+
+  if (confirmText !== 'PULIHKAN') {
+    showToast('Ketik "PULIHKAN" (huruf besar) dulu untuk konfirmasi', 'danger');
+    return;
+  }
+  if (!fileInput.files.length) {
+    showToast('Pilih file backup dulu', 'danger');
+    return;
+  }
+
+  let backup;
+  try {
+    backup = JSON.parse(await fileInput.files[0].text());
+  } catch (e) {
+    showToast('File bukan JSON yang valid', 'danger');
+    return;
+  }
+
+  showToast('Memulihkan data, mohon tunggu...', 'success');
+  const token = await getAccessToken();
+
+  const res = await fetch('/api/restore', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(backup)
+  });
+  const json = await res.json();
+
+  if (!res.ok) { showToast('Gagal restore: ' + json.error, 'danger'); return; }
+
+  showToast('Restore berhasil!', 'success');
+  document.getElementById('restoreConfirm').value = '';
+  fileInput.value = '';
+  await loadDashboard(currentPeriode);
 }
 
 (async () => {

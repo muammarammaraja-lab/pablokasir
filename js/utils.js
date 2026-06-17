@@ -43,3 +43,19 @@ function confirmDialog(message, labelOk = 'Hapus') {
     });
   });
 }
+
+async function applyCustomLogo() {
+  try {
+    const { data } = await sb.from('app_settings').select('logo_url').eq('id', 1).single();
+    if (data?.logo_url) {
+      document.querySelectorAll('.logo-mark').forEach(el => {
+        const img = document.createElement('img');
+        img.src = data.logo_url;
+        img.alt = 'Logo';
+        img.className = 'logo-mark';
+        img.style.cssText = 'width:20px;height:20px;border-radius:5px;vertical-align:-5px;margin-right:8px;object-fit:cover;';
+        el.replaceWith(img);
+      });
+    }
+  } catch (e) { /* gagal ambil setting logo, biarkan logo default tetap tampil */ }
+}

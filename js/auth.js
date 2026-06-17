@@ -34,6 +34,7 @@ async function requireAuth(allowedRoles) {
   }
 
   applyRoleUI();
+  applyCustomLogo();
   return true;
 }
 
