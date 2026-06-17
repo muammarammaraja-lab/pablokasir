@@ -15,6 +15,7 @@ create table products (
   min_qty_grosir numeric(12,2) default 10,   -- ambang qty supaya kena harga grosir
   stok numeric(12,2) not null default 0 check (stok >= 0),
   stok_minimum numeric(12,2) default 5,
+  barcode text unique,                       -- kode barcode/QR fisik di kemasan, boleh kosong
   deleted_at timestamptz,                    -- soft delete: null = aktif, terisi = diarsipkan
   created_at timestamptz default now()
 );
@@ -31,6 +32,21 @@ create table sales (
 );
 
 create sequence if not exists transaksi_seq start 1;
+
+create table retur (
+  id uuid primary key default gen_random_uuid(),
+  nomor_retur text,
+  sale_id uuid references sales(id),
+  product_id uuid references products(id),
+  qty numeric(12,2) not null,
+  alasan text not null,
+  nominal_pengembalian numeric(12,2) not null,
+  bisa_dijual_lagi boolean default true,
+  tanggal timestamptz default now(),
+  dibuat_oleh text
+);
+
+create sequence if not exists retur_seq start 1;
 
 create table sale_items (
   id uuid primary key default gen_random_uuid(),
@@ -114,7 +130,7 @@ create table stok_log (
   product_id uuid references products(id),
   bahan_baku_id uuid references bahan_baku(id),
   tanggal timestamptz default now(),
-  tipe text check (tipe in ('Penjualan','Produksi','Koreksi Manual','Pembelian Bahan','Konsumsi Produksi','Koreksi Bahan')),
+  tipe text check (tipe in ('Penjualan','Produksi','Koreksi Manual','Pembelian Bahan','Konsumsi Produksi','Koreksi Bahan','Retur')),
   qty numeric(12,2) not null,           -- selisih: negatif = berkurang, positif = bertambah
   saldo_setelah numeric(12,2) not null, -- stok setelah pergerakan ini, untuk audit
   sale_id uuid references sales(id),
@@ -413,6 +429,30 @@ create policy "po_select_owner" on purchase_orders for select to authenticated u
   exists (select 1 from profiles where id = auth.uid() and role = 'owner')
 );
 
+alter table retur enable row level security;
+create policy "retur_select_owner" on retur for select to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+
+-- app_settings: siapa saja boleh baca (termasuk sebelum login, untuk tampilkan logo
+-- di halaman login), tapi cuma owner yang boleh ubah
+alter table app_settings enable row level security;
+create policy "app_settings_select_all" on app_settings for select using (true);
+create policy "app_settings_update_owner" on app_settings for update to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+
+-- Storage bucket untuk logo — public dibaca, cuma owner yang boleh upload/ganti
+insert into storage.buckets (id, name, public) values ('branding', 'branding', true) on conflict (id) do nothing;
+
+create policy "branding_public_read" on storage.objects for select using (bucket_id = 'branding');
+create policy "branding_owner_upload" on storage.objects for insert to authenticated with check (
+  bucket_id = 'branding' and exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+create policy "branding_owner_update" on storage.objects for update to authenticated using (
+  bucket_id = 'branding' and exists (select 1 from profiles where id = auth.uid() and role = 'owner')
+);
+
 grant execute on function process_sale(jsonb, numeric, text) to authenticated;
 grant execute on function process_produksi(uuid, numeric, numeric, numeric, text) to authenticated;
 grant execute on function process_koreksi_stok(uuid, numeric, text) to authenticated;
@@ -420,6 +460,72 @@ grant execute on function process_beli_bahan(uuid, numeric, numeric) to authenti
 grant execute on function process_buat_po(uuid, uuid, numeric, numeric, text) to authenticated;
 grant execute on function process_terima_po(uuid, numeric, numeric) to authenticated;
 grant execute on function process_batalkan_po(uuid) to authenticated;
+
+-- 4e. FUNGSI: retur penjualan ----------------------------------
+-- Mengembalikan stok (kalau barangnya masih bisa dijual lagi) dan mencatat
+-- nominal pengembalian. Data sales/sale_items asli TIDAK diubah — retur
+-- dicatat sebagai entri terpisah yang terhubung, supaya histori asli tetap utuh.
+
+create or replace function process_retur(
+  p_sale_id uuid,
+  p_product_id uuid,
+  p_qty numeric,
+  p_alasan text,
+  p_bisa_dijual_lagi boolean default true
+) returns uuid as $$
+declare
+  v_role text;
+  v_email text;
+  v_harga_satuan numeric;
+  v_qty_asli numeric;
+  v_nominal numeric;
+  v_retur_id uuid;
+  v_nomor_retur text;
+  v_saldo_baru numeric;
+begin
+  select role into v_role from profiles where id = auth.uid();
+  if v_role is distinct from 'owner' then
+    raise exception 'Hanya Owner yang bisa memproses retur';
+  end if;
+
+  if p_qty <= 0 then
+    raise exception 'Qty retur harus lebih dari 0';
+  end if;
+  if p_alasan is null or trim(p_alasan) = '' then
+    raise exception 'Alasan retur wajib diisi';
+  end if;
+
+  select qty, harga_satuan into v_qty_asli, v_harga_satuan
+  from sale_items where sale_id = p_sale_id and product_id = p_product_id;
+
+  if v_qty_asli is null then
+    raise exception 'Item ini tidak ditemukan di transaksi tersebut';
+  end if;
+  if p_qty > v_qty_asli then
+    raise exception 'Qty retur tidak boleh lebih besar dari qty yang dibeli';
+  end if;
+
+  select email into v_email from auth.users where id = auth.uid();
+  v_nominal := p_qty * v_harga_satuan;
+  v_nomor_retur := 'RTN-' || to_char(now(), 'YYYYMMDD') || '-' || lpad(nextval('retur_seq')::text, 4, '0');
+
+  insert into retur (nomor_retur, sale_id, product_id, qty, alasan, nominal_pengembalian, bisa_dijual_lagi, dibuat_oleh)
+  values (v_nomor_retur, p_sale_id, p_product_id, p_qty, p_alasan, v_nominal, p_bisa_dijual_lagi, v_email)
+  returning id into v_retur_id;
+
+  if p_bisa_dijual_lagi then
+    update products set stok = stok + p_qty where id = p_product_id
+    returning stok into v_saldo_baru;
+
+    insert into stok_log (product_id, tipe, qty, saldo_setelah, keterangan, dibuat_oleh)
+    values (p_product_id, 'Retur', p_qty, v_saldo_baru, 'Retur ' || v_nomor_retur || ': ' || p_alasan, v_email);
+  end if;
+
+  return v_retur_id;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+grant execute on function process_retur(uuid, uuid, numeric, text, boolean) to authenticated;
 
 -- 4d. FUNGSI: Purchase Order (buat, terima, batalkan) ----------
 
@@ -523,6 +629,14 @@ $$ language plpgsql security definer set search_path = public;
 -- Owner = akses penuh (kasir, produksi, laporan). Kasir = cuma halaman Kasir.
 -- Profil dibuat otomatis (default 'kasir') tiap kali ada user baru di Supabase Auth;
 -- ubah jadi 'owner' manual lewat SQL untuk akun pemilik.
+
+create table app_settings (
+  id int primary key default 1,
+  logo_url text,
+  updated_at timestamptz default now(),
+  constraint single_row check (id = 1)
+);
+insert into app_settings (id) values (1) on conflict (id) do nothing;
 
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,

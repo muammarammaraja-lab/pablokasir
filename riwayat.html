@@ -17,6 +17,8 @@
     <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
     <a href="supplier.html" class="owner-only">Supplier &amp; PO</a>
     <a href="riwayat.html" class="owner-only active">Riwayat</a>
+    <a href="users.html" class="owner-only">User</a>
+    <a href="settings.html" class="owner-only">Pengaturan</a>
     <a href="dashboard.html" class="owner-only">Laporan</a>
     <a href="#" onclick="logout();return false;">Keluar</a>
   </nav>
@@ -53,6 +55,16 @@
       </table>
     </div>
   </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Riwayat Retur</h3>
+    <div class="table-wrap" style="margin-top:10px;">
+      <table>
+        <thead><tr><th>No. Retur</th><th>Tanggal</th><th>Produk</th><th>Qty</th><th>Nominal Kembali</th><th>Alasan</th></tr></thead>
+        <tbody id="returHistoryBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div id="detailModal" style="display:none;position:fixed;inset:0;background:rgba(61,40,23,0.55);align-items:center;justify-content:center;z-index:50;">
@@ -60,6 +72,31 @@
     <h3 style="margin-bottom:10px;">Detail Transaksi</h3>
     <div id="detailBody"></div>
     <button class="btn btn-secondary btn-block" style="margin-top:14px;" onclick="closeDetail()">Tutup</button>
+  </div>
+</div>
+
+<div id="returModal" style="display:none;position:fixed;inset:0;background:rgba(61,40,23,0.7);align-items:center;justify-content:center;z-index:60;">
+  <div class="card" style="width:300px;">
+    <h3 style="margin-bottom:10px;">Proses Retur</h3>
+    <p class="subtitle" id="returProductLabel" style="margin-bottom:14px;"></p>
+    <form id="returForm">
+      <input type="hidden" id="returSaleId">
+      <input type="hidden" id="returProductId">
+      <div class="field">
+        <label>Qty Diretur</label>
+        <input type="number" step="0.01" id="returQty" required placeholder="0">
+      </div>
+      <div class="field">
+        <label>Alasan (wajib)</label>
+        <input type="text" id="returAlasan" required placeholder="Rusak, salah produk, dll">
+      </div>
+      <div class="field" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="returBisaDijual" checked style="width:auto;">
+        <label style="margin-bottom:0;">Barang masih bisa dijual lagi (stok ditambah balik)</label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Proses Retur</button>
+      <button type="button" class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="closeRetur()">Batal</button>
+    </form>
   </div>
 </div>
 

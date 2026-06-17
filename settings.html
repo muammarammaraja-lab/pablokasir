@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengaturan — ARENSI POS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <svg class="logo-mark" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>ARENSI <span>POS</span>
+  </div>
+  <nav>
+    <a href="index.html">Kasir</a>
+    <a href="produksi.html" class="owner-only">Produksi &amp; Stok</a>
+    <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
+    <a href="supplier.html" class="owner-only">Supplier &amp; PO</a>
+    <a href="riwayat.html" class="owner-only">Riwayat</a>
+    <a href="users.html" class="owner-only">User</a>
+    <a href="settings.html" class="owner-only active">Pengaturan</a>
+    <a href="dashboard.html" class="owner-only">Laporan</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Pengaturan</h1>
+  <p class="subtitle">Atur logo toko yang tampil di seluruh halaman</p>
+
+  <div class="card" style="max-width:420px;">
+    <h3>Logo Toko</h3>
+    <p class="subtitle" style="margin-bottom:14px;">Format gambar (PNG/JPG), disarankan persegi, ukuran kecil (di bawah 1MB) untuk loading cepat</p>
+
+    <div id="currentLogoPreview" style="margin-bottom:14px;"></div>
+
+    <div class="field">
+      <label>Pilih File Logo</label>
+      <input type="file" id="logoFile" accept="image/*">
+    </div>
+    <button class="btn btn-primary" type="button" onclick="uploadLogo()">Upload &amp; Simpan</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/settings.js"></script>
+</body>
+</html>

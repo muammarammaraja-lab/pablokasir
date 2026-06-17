@@ -17,6 +17,8 @@
     <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
     <a href="supplier.html" class="owner-only">Supplier &amp; PO</a>
     <a href="riwayat.html" class="owner-only">Riwayat</a>
+    <a href="users.html" class="owner-only">User</a>
+    <a href="settings.html" class="owner-only">Pengaturan</a>
     <a href="dashboard.html" class="owner-only active">Laporan</a>
     <a href="#" onclick="logout();return false;">Keluar</a>
   </nav>
@@ -62,7 +64,7 @@
       <div class="value" id="statLaba">Rp 0</div>
     </div>
   </div>
-  <p class="subtitle" style="margin-top:-10px;">Laba bersih = Laba Kotor − Biaya Operasional. Modal Bahan Mentah &amp; Biaya Produksi tidak dikurangkan lagi di sini karena sudah tercermin di HPP produk.</p>
+  <p class="subtitle" style="margin-top:-10px;">Laba bersih = Laba Kotor − Biaya Operasional. Modal Bahan Mentah &amp; Biaya Produksi tidak dikurangkan lagi di sini karena sudah tercermin di HPP produk. Total Pendapatan sudah dikurangi nilai retur periode ini.</p>
 
   <div class="grid-2">
     <div class="card">
@@ -133,6 +135,20 @@
         </table>
       </div>
     </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Restore dari Backup</h3>
+    <p class="subtitle" style="margin-bottom:14px;">Upload file backup JSON untuk memulihkan data. Ini MENGGABUNGKAN data berdasarkan ID (insert/update), bukan menghapus yang sudah ada — aman dipakai walau sudah ada transaksi baru sejak backup dibuat.</p>
+    <div class="field">
+      <label>File Backup (.json)</label>
+      <input type="file" id="restoreFile" accept="application/json">
+    </div>
+    <div class="field">
+      <label>Ketik "PULIHKAN" untuk konfirmasi</label>
+      <input type="text" id="restoreConfirm" placeholder="PULIHKAN">
+    </div>
+    <button class="btn btn-primary" type="button" onclick="restoreFromBackup()">Mulai Restore</button>
   </div>
 </div>
 

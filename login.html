@@ -10,7 +10,7 @@
 <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;">
   <div class="card" style="width:100%;max-width:340px;">
     <div style="text-align:center;margin-bottom:20px;">
-      <svg width="32" height="32" viewBox="0 0 20 20" fill="none" style="margin-bottom:8px;"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>
+      <svg class="logo-mark" width="32" height="32" viewBox="0 0 20 20" fill="none" style="margin-bottom:8px;"><path d="M10 1C10 1 4 8 4 12.5C4 15.5 6.5 18 10 18C13.5 18 16 15.5 16 12.5C16 8 10 1 10 1Z" fill="#D4862E"/></svg>
       <h1 style="font-size:20px;">ARENSI POS</h1>
       <p class="subtitle" style="margin-bottom:0;">Masuk untuk melanjutkan</p>
     </div>
@@ -54,6 +54,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
 // Kalau sesi masih aktif, langsung lempar ke halaman utama tanpa perlu login ulang
 (async () => {
+  applyCustomLogo();
   const { data: { session } } = await sb.auth.getSession();
   if (session) window.location.href = 'index.html';
 })();

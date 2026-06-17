@@ -17,6 +17,8 @@
     <a href="bahan-baku.html" class="owner-only">Bahan Baku</a>
     <a href="supplier.html" class="owner-only">Supplier &amp; PO</a>
     <a href="riwayat.html" class="owner-only">Riwayat</a>
+    <a href="users.html" class="owner-only">User</a>
+    <a href="settings.html" class="owner-only">Pengaturan</a>
     <a href="dashboard.html" class="owner-only">Laporan</a>
     <a href="#" onclick="logout();return false;">Keluar</a>
   </nav>
@@ -59,24 +61,24 @@
           <input type="number" id="minQtyGrosir" placeholder="10">
         </div>
         <div class="field">
-  <label>Stok Minimum (alert menipis)</label>
-  <input type="number" id="stokMinimum" placeholder="5">
-</div>
-<div class="field">
-  <label>Barcode/QR (opsional)</label>
-  <div style="display:flex;gap:8px;">
-    <input type="text" id="barcodeProduk" placeholder="Scan atau ketik manual" style="flex:1;">
-    <button type="button" class="btn btn-secondary" onclick="scanForProductForm()" style="white-space:nowrap;">Scan</button>
-  </div>
-</div>
-<button type="submit" class="btn btn-primary">Simpan Produk</button>
+          <label>Stok Minimum (alert menipis)</label>
+          <input type="number" id="stokMinimum" placeholder="5">
+        </div>
+        <div class="field">
+          <label>Barcode/QR (opsional)</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="barcodeProduk" placeholder="Scan atau ketik manual" style="flex:1;">
+            <button type="button" class="btn btn-secondary" onclick="scanForProductForm()" style="white-space:nowrap;">Scan</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan Produk</button>
         <button type="button" class="btn btn-secondary" onclick="resetProdukForm()">Batal</button>
       </form>
 
       <h3 style="margin-top:24px;">Daftar Produk</h3>
       <div class="table-wrap" style="margin-top:10px;">
         <table>
-          <thead><tr><th>Nama</th><th>Satuan</th><th>HPP</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th></th><th></th></tr></thead>
+          <thead><tr><th>Nama</th><th>Satuan</th><th>HPP</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th>Barcode</th><th></th><th></th></tr></thead>
           <tbody id="productTableBody"></tbody>
         </table>
       </div>
