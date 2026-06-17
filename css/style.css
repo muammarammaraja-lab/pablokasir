@@ -80,7 +80,7 @@ h1 { font-size: 26px; margin-bottom: 4px; }
 
 input, select, textarea {
   font-family: var(--font-body); border: 1px solid var(--border); border-radius: 8px;
-  padding: 9px 12px; font-size: 14px; width: 100%; background: #fff; color: var(--brown-900);
+  padding: 9px 12px; font-size: 14px; width: 100%; min-width: 0; background: #fff; color: var(--brown-900);
 }
 label { font-size: 13px; font-weight: 500; color: var(--brown-700); display: block; margin-bottom: 4px; }
 .field { margin-bottom: 14px; }
